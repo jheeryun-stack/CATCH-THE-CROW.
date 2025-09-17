@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html>
+<head>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+<meta charset="utf-8">
+
+<style>
+  .pixel-text {
+    font-family: 'Press Start 2P', cursive;
+    font-size: 40px;
+    color: white;
+    position: absolute;
+    top: 20px;
+    left: 20px;
+  }
+  body {
+    margin: 0;
+    overflow: hidden;
+    background-image: url("background.png"); 
+    background-size: cover;   
+    background-position: center; 
+    min-height: 100vh;
+  }
+  #crow {
+    position: absolute;
+    top: 100px;
+    left: 0;
+    width: 80px;
+    height: 80px;
+    cursor: pointer;
+    display: none;
+  }
+  #gameOver {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-family: 'Press Start 2P', cursive;
+    font-size: 60px;
+    color: red;
+    display: none;
+    z-index: 999;
+  }
+  #startScreen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
+  #startBtn {
+    font-family: 'Press Start 2P', cursive;
+    font-size: 30px;
+    padding: 20px 40px;
+    background: white;
+    color: black;
+    border: none;
+    cursor: pointer;
+  }
+</style>
+</head>
+<body>
+
+<div class="pixel-text">CATCH THE CROW!</div>
+<div id="gameOver">GAME OVER</div>
+
+<div id="startScreen">
+  <button id="startBtn">START</button>
+</div>
+
+<audio id="startSound" src="start.wav"></audio>
+<audio id="crowSound" src="crow.wav" loop></audio>
+<img id="crow" src="crow.png">
+
+<script>
+let posX = 0;        
+let posY = 100;      
+let moveRight = true; 
+let fly = false;       
+let cPlay = false;    
+let speed = 4;        
+
+setInterval(function(){
+  if (fly == true) {
+    if (Math.random() < 0.01) {
+      moveRight = !moveRight;
+    }
+    if (Math.random() < 0.02) {
+      speed = Math.random() * 6 + 2;
+    }
+    if (moveRight == true) {
+      posX += speed; 
+    } else {
+      posX -= speed;
+    }
+    posY += Math.sin(posX / 20) * 2;
+    if (posX > window.innerWidth - 80) {
+      moveRight = false;
+      posY = Math.random() * (window.innerHeight - 150);
+    }
+    if (posX < 0) {
+      moveRight = true;
+      posY = Math.random() * (window.innerHeight - 150);
+    }
+    crow.style.left = posX + "px";
+    crow.style.top = posY + "px";
+  } else if (cPlay == true) {
+    posY += 8;
+    crow.style.top = posY + "px";
+    if (posY > window.innerHeight - 80) {
+      posY = window.innerHeight - 80;
+      document.getElementById("gameOver").style.display = "block";
+    }
+  }
+}, 40);
+
+document.getElementById("startBtn").onclick = function() {
+  document.getElementById("startSound").play();
+  document.getElementById("startScreen").style.display = "none";
+  document.getElementById("crow").style.display = "block";
+  fly = true;
+};
+
+crow.onclick = function(){
+  if (cPlay == false) {
+    document.getElementById("startSound").pause();
+    document.getElementById("startSound").currentTime = 0;
+    document.getElementById("crowSound").play();          
+    crow.src = "crow_dead.png"; 
+    fly = false;                
+    cPlay = true;               
+  }
+}
+</script>
+
+</body>
+</html>
